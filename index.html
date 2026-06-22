@@ -5,8 +5,8 @@ body { font-family: var(--font-sans); }
 .wrap { padding: 1rem 0; }
 .header { margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
 .header-left { flex: 1; }
-.header h1 { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
-.header p { font-size: 14px; color: var(--color-text-secondary); margin-top: 4px; }
+.header h1 { font-size: 25px; font-weight: 500; color: var(--color-text-primary); }
+.header p { font-size: 20px; color: var(--color-text-secondary); margin-top: 4px; }
 .timer-box { display: flex; align-items: center; gap: 12px; background: var(--color-background-secondary); padding: 12px 16px; border-radius: 8px; }
 .timer-display { font-size: 24px; font-weight: 600; color: var(--color-text-primary); font-family: monospace; min-width: 80px; }
 .timer-display.warning { color: #ff9800; }
@@ -18,7 +18,7 @@ body { font-family: var(--font-sans); }
 .finish-btn:hover { background: #E65100; }
 .exam-not-started { opacity: 0.5; pointer-events: none; }
 .topic-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.5rem; }
-.topic-btn { font-size: 12px; padding: 6px 14px; border-radius: 20px; border: 2px solid var(--color-border-secondary); background: var(--color-background-secondary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.2s; font-weight: 500; }
+.topic-btn { font-size: 15px; padding: 6px 14px; border-radius: 20px; border: 2px solid var(--color-border-secondary); background: var(--color-background-secondary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.2s; font-weight: bold; }
 .topic-btn.active { background: #2196F3; color: white; border-color: #1976D2; box-shadow: 0 2px 8px rgba(33, 150, 243, 0.4); }
 .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
 .stat-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px; text-align: center; }
@@ -34,10 +34,10 @@ body { font-family: var(--font-sans); }
 .q-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; }
 .q-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .q-num { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); }
-.q-topic { font-size: 11px; padding: 3px 8px; border-radius: 12px; background: var(--color-background-info); color: var(--color-text-info); }
-.q-text { font-size: 15px; color: var(--color-text-primary); line-height: 1.6; margin-bottom: 12px; }
+.q-topic { font-size: 14px; padding: 3px 8px; border-radius: 12px; background: var(--color-background-info); color: var(--color-text-info); }
+.q-text { font-size: 18px; color: var(--color-text-primary); line-height: 1.6; margin-bottom: 12px; }
 .options { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; }
-.opt { padding: 8px 12px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); font-size: 13px; color: var(--color-text-primary); cursor: pointer; transition: all 0.15s; background: var(--color-background-primary); text-align: left; display: flex; align-items: center; gap: 8px; }
+.opt { padding: 8px 12px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); font-size: 13px; font-weight: bold; color: var(--color-text-primary); cursor: pointer; transition: all 0.15s; background: var(--color-background-primary); text-align: left; display: flex; align-items: center; gap: 8px; }
 .opt:hover:not(:disabled) { background: var(--color-background-secondary); border-color: var(--color-border-secondary); }
 .opt.selected { background: var(--color-background-info); border-color: var(--color-border-info); }
 .opt.correct { background: var(--color-background-success); color: var(--color-text-success); border-color: var(--color-border-success); }
@@ -51,8 +51,8 @@ body { font-family: var(--font-sans); }
 .opt.wrong .checkbox::after { content: '✗'; color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; font-weight: bold; }
 .answer-box { display: none; margin-top: 10px; padding: 10px 14px; border-radius: var(--border-radius-md); background: var(--color-background-success); border-left: 3px solid var(--color-text-success); }
 .answer-box.show { display: block; }
-.answer-box .ans-label { font-size: 12px; font-weight: 500; color: var(--color-text-success); margin-bottom: 4px; }
-.answer-box .ans-text { font-size: 13px; color: var(--color-text-primary); line-height: 1.5; }
+.answer-box .ans-label { font-size: 12px; font-weight: 700; color: var(--color-text-success); margin-bottom: 4px; }
+.answer-box .ans-text { font-size: 13px; font-weight: 700; color: var(--color-text-primary); line-height: 1.5; }
 .show-ans-btn { font-size: 12px; padding: 5px 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: transparent; color: var(--color-text-secondary); cursor: pointer; transition: all 0.15s; }
 .show-ans-btn:hover:not(:disabled) { background: var(--color-background-secondary); }
 .show-ans-btn:disabled { opacity: 0.5; cursor: not-allowed; }
