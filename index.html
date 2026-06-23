@@ -20,7 +20,6 @@ body { font-family: var(--font-sans); }
 .topic-btn { font-size: 15px; padding: 6px 14px; border-radius: 20px; border: 2px solid var(--color-border-secondary); background: var(--color-background-secondary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.2s; font-weight: bold; }
 .topic-btn.active { background: #2196F3; color: white; border-color: #1976D2; box-shadow: 0 2px 8px rgba(33, 150, 243, 0.4); }
 
-/* Front Stats Row: Shows only Total and Attempted */
 .stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 1.5rem; max-width: 500px; margin-left: auto; margin-right: auto; }
 .stat-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px; text-align: center; }
 .stat-val { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
@@ -42,8 +41,8 @@ body { font-family: var(--font-sans); }
 .options { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; }
 .opt { padding: 8px 12px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); font-size: 13px; font-weight: bold; color: var(--color-text-primary); cursor: pointer; transition: all 0.15s; background: var(--color-background-primary); text-align: left; display: flex; align-items: center; gap: 8px; }
 .opt:hover:not(:disabled) { background: var(--color-background-secondary); border-color: var(--color-border-secondary); }
+.opt:disabled { opacity: 0.7; cursor: not-allowed; }
 
-/* Only Selection Blue remains */
 .opt.selected { background: var(--color-background-info); border-color: var(--color-border-info); }
 .checkbox { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--color-border-secondary); border-radius: 3px; background: white; flex-shrink: 0; position: relative; }
 .opt.selected .checkbox { background: #2196F3; border-color: #2196F3; }
@@ -98,6 +97,7 @@ body { font-family: var(--font-sans); }
 <script src="js/questions.js"></script>
 <script>
 let answeredMap = {};
+let revealedMap = {}; // Tracks which questions have had their answers shown
 
 let examStarted = false;
 let timeRemaining = 3 * 60 * 60; // 3 hours in seconds
@@ -210,6 +210,9 @@ function renderQuestions() {
   area.innerHTML = topic.qs.map((q, idx) => {
     const gIdx = globalOffset + idx;
     const state = answeredMap[gIdx];
+    const isRevealed = revealedMap[gIdx] === true;
+    const isSelected = state !== undefined && state !== null;
+
     return `
     <div class="q-card" id="qcard-${gIdx}">
       <div class="q-meta">
@@ -221,14 +224,16 @@ function renderQuestions() {
         ${q.opts.map((opt, oi) => {
           let cls = 'opt';
           if (state === oi) cls += ' selected';
-          return `<button class="${cls}" onclick="selectOpt(${gIdx},${oi},${q.ans})"><span class="checkbox"></span><span>${opt}</span></button>`;
+          // Disable individual buttons if already revealed
+          let disabledAttr = isRevealed ? 'disabled' : '';
+          return `<button class="${cls}" ${disabledAttr} onclick="selectOpt(${gIdx},${oi},${q.ans})"><span class="checkbox"></span><span>${opt}</span></button>`;
         }).join('')}
       </div>
       <div class="q-footer">
         <div></div>
-        <button class="show-ans-btn" id="showBtn-${gIdx}" onclick="revealAns(${gIdx})" ${state === undefined || state === null ? 'disabled' : ''}>Show answer</button>
+        <button class="show-ans-btn" id="showBtn-${gIdx}" onclick="revealAns(${gIdx})" ${(!isSelected || isRevealed) ? 'disabled' : ''}>Show answer</button>
       </div>
-      <div class="answer-box ${state !== undefined && state !== null ? 'show' : ''}" id="ans-${gIdx}">
+      <div class="answer-box ${isRevealed ? 'show' : ''}" id="ans-${gIdx}">
         <div class="ans-label">Correct answer: ${q.opts[q.ans]}</div>
         <div class="ans-text">${q.exp}</div>
       </div>
@@ -237,7 +242,7 @@ function renderQuestions() {
 }
 
 function selectOpt(gIdx, chosen, correct_idx) {
-  if (!examStarted) return;
+  if (!examStarted || revealedMap[gIdx]) return; // Block if exam not active or already revealed
   
   if (answeredMap[gIdx] === chosen) {
     answeredMap[gIdx] = null;
@@ -255,18 +260,12 @@ function selectOpt(gIdx, chosen, correct_idx) {
   
   updateStats();
   renderQuestions();
-  
-  setTimeout(() => {
-    const showBtn = document.getElementById('showBtn-' + gIdx);
-    if (showBtn && answeredMap[gIdx] !== null && answeredMap[gIdx] !== undefined) {
-      showBtn.disabled = false;
-    }
-  }, 0);
 }
 
 function revealAns(gIdx) {
-  const box = document.getElementById('ans-'+gIdx);
-  if (box) box.classList.add('show');
+  // Set revealed status to true and re-render to freeze options and display answer
+  revealedMap[gIdx] = true;
+  renderQuestions();
 }
 
 if (typeof document !== 'undefined') {
