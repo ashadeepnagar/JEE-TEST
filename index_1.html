@@ -6,22 +6,13 @@ body { font-family: var(--font-sans); }
 .header-left { text-align: center; }
 .header h1 { font-size: 25px; font-weight: 500; text-align: center; color: var(--color-text-primary); }
 .header p { font-size: 20px; color: var(--color-text-secondary); text-align: center; margin-top: 4px; }
-
-/* Student Registration Card Styling */
-.reg-card { background: var(--color-background-secondary); border: 1px solid var(--color-border-secondary); border-radius: 8px; padding: 20px; max-width: 500px; margin: 0 auto 1.5rem auto; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-.reg-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 12px; color: var(--color-text-primary); text-align: center; }
-.reg-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.reg-form .full-width { grid-column: span 2; }
-.reg-form input { padding: 10px; border: 1px solid var(--color-border-tertiary); border-radius: 6px; font-size: 14px; width: 100%; background: var(--color-background-primary); color: var(--color-text-primary); }
-.reg-form input:focus { border-color: #2196F3; outline: none; }
-
 .timer-box { display: flex; align-items: center; gap: 12px; background: var(--color-background-secondary); padding: 12px 16px; border-radius: 8px; }
 .timer-display { font-size: 24px; font-weight: 600; color: var(--color-text-primary); font-family: monospace; min-width: 80px; }
 .timer-display.warning { color: #ff9800; }
 .timer-display.critical { color: #f44336; }
 .start-btn { padding: 8px 16px; background: #4CAF50; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.15s; }
 .start-btn:hover:not(:disabled) { background: #45a049; }
-.start-btn:disabled { background: #cccccc; cursor: not-allowed; opacity: 0.6; }
+.start-btn:disabled { background: #cccccc; cursor: not-allowed; }
 .finish-btn { padding: 8px 16px; background: #FF6F00; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; transition: all 0.15s; margin-left: 10px; }
 .finish-btn:hover { background: #E65100; }
 .exam-not-started { opacity: 0.5; pointer-events: none; }
@@ -38,7 +29,6 @@ body { font-family: var(--font-sans); }
 .completion-modal.show { display: flex; }
 .completion-card { background: white; padding: 40px; border-radius: 12px; text-align: center; max-width: 500px; }
 .completion-card h2 { font-size: 28px; color: #4CAF50; margin-bottom: 20px; }
-.student-badge { font-size: 15px; color: #555; background: #e3f2fd; padding: 8px 12px; border-radius: 6px; margin-bottom: 15px; display: inline-block; font-weight: 500; border: 1px solid #bbdefb; }
 .final-score { font-size: 48px; font-weight: 700; color: #2196F3; margin: 20px 0; }
 .score-details { font-size: 16px; color: #666; margin: 10px 0; line-height: 1.8; }
 .score-percentage { font-size: 24px; font-weight: 600; color: #FF9800; margin-top: 20px; }
@@ -75,21 +65,9 @@ body { font-family: var(--font-sans); }
       <h1>JEE Main practice set</h1>
       <p>75 questions · 3 hours · Check/uncheck answers · Click start to begin</p>
     </div>
-
-    <!-- Student Information Inputs Block -->
-    <div class="reg-card" id="regFormContainer">
-      <h3>Enter Student Details to Unlock Exam</h3>
-      <div class="reg-form">
-        <input type="text" id="firstName" placeholder="First Name" oninput="validateForm()">
-        <input type="text" id="lastName" placeholder="Last Name" oninput="validateForm()">
-        <input type="email" id="studentEmail" placeholder="Email Address" class="full-width" oninput="validateForm()">
-      </div>
-    </div>
-
     <div class="timer-box">
       <div class="timer-display" id="timer">3:00:00</div>
-      <!-- Disabled by default until form validation succeeds -->
-      <button class="start-btn" id="startBtn" onclick="startExam()" disabled>START EXAM</button>
+      <button class="start-btn" id="startBtn" onclick="startExam()">START EXAM</button>
       <button class="finish-btn hidden" id="finishBtn" onclick="finishExamEarly()">FINISH EXAM</button>
     </div>
   </div>
@@ -105,8 +83,6 @@ body { font-family: var(--font-sans); }
   <div class="completion-modal" id="completionModal">
     <div class="completion-card">
       <h2>🎉 Test Completed!</h2>
-      <!-- Badge displaying student identity -->
-      <div class="student-badge" id="studentSummary">Student: </div>
       <div class="final-score" id="finalScore">0</div>
       <div class="score-details">
         <div>Total Questions: <strong id="totalQuestions">75</strong></div>
@@ -121,7 +97,7 @@ body { font-family: var(--font-sans); }
 <script src="js/questions.js"></script>
 <script>
 let answeredMap = {};
-let revealedMap = {};
+let revealedMap = {}; // Tracks which questions have had their answers shown
 
 let examStarted = false;
 let timeRemaining = 3 * 60 * 60; // 3 hours in seconds
@@ -129,22 +105,6 @@ let timerInterval = null;
 let alertShown = false;
 
 let attempted = 0, correct = 0;
-
-// Validates the input forms to prevent early start
-function validateForm() {
-  if (examStarted) return;
-  const fname = document.getElementById('firstName').value.trim();
-  const lname = document.getElementById('lastName').value.trim();
-  const email = document.getElementById('studentEmail').value.trim();
-  const startBtn = document.getElementById('startBtn');
-  
-  // Basic validation ensuring fields are filled and email has minimal structural truth
-  if (fname !== "" && lname !== "" && email !== "" && email.includes("@")) {
-    startBtn.disabled = false;
-  } else {
-    startBtn.disabled = true;
-  }
-}
 
 function updateStats() {
   document.getElementById('attempted').textContent = attempted;
@@ -159,11 +119,6 @@ function startExam() {
   document.getElementById('finishBtn').classList.remove('hidden');
   document.getElementById('topic-nav').classList.remove('exam-not-started');
   document.getElementById('questions-area').classList.remove('exam-not-started');
-  
-  // Lock the input fields during execution
-  document.getElementById('firstName').disabled = true;
-  document.getElementById('lastName').disabled = true;
-  document.getElementById('studentEmail').disabled = true;
   
   startTimer();
   renderNav();
@@ -220,12 +175,6 @@ function completeExam() {
   const unattempted = totalQs - attempted;
   const percentage = totalQs > 0 ? Math.round((correct / totalQs) * 100) : 0;
   
-  // Extract inputs to display on final evaluation badge
-  const fname = document.getElementById('firstName').value.trim();
-  const lname = document.getElementById('lastName').value.trim();
-  const email = document.getElementById('studentEmail').value.trim();
-  document.getElementById('studentSummary').textContent = `${fname} ${lname} (${email})`;
-
   document.getElementById('totalQuestions').textContent = totalQs;
   document.getElementById('attemptedQuestions').textContent = attempted;
   document.getElementById('unattempted').textContent = unattempted;
@@ -275,6 +224,7 @@ function renderQuestions() {
         ${q.opts.map((opt, oi) => {
           let cls = 'opt';
           if (state === oi) cls += ' selected';
+          // Disable individual buttons if already revealed
           let disabledAttr = isRevealed ? 'disabled' : '';
           return `<button class="${cls}" ${disabledAttr} onclick="selectOpt(${gIdx},${oi},${q.ans})"><span class="checkbox"></span><span>${opt}</span></button>`;
         }).join('')}
@@ -292,7 +242,7 @@ function renderQuestions() {
 }
 
 function selectOpt(gIdx, chosen, correct_idx) {
-  if (!examStarted || revealedMap[gIdx]) return;
+  if (!examStarted || revealedMap[gIdx]) return; // Block if exam not active or already revealed
   
   if (answeredMap[gIdx] === chosen) {
     answeredMap[gIdx] = null;
@@ -313,6 +263,7 @@ function selectOpt(gIdx, chosen, correct_idx) {
 }
 
 function revealAns(gIdx) {
+  // Set revealed status to true and re-render to freeze options and display answer
   revealedMap[gIdx] = true;
   renderQuestions();
 }
