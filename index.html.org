@@ -1,9 +1,10 @@
+
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: var(--font-sans); }
 .wrap { padding: 1rem 0; }
-.header { margin-bottom: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 16px; }
-.header-left { text-align: center; }
+.header { margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+.header-left { flex: 1; }
 .header h1 { font-size: 25px; font-weight: 500; text-align: center; color: var(--color-text-primary); }
 .header p { font-size: 20px; color: var(--color-text-secondary); text-align: center; margin-top: 4px; }
 .timer-box { display: flex; align-items: center; gap: 12px; background: var(--color-background-secondary); padding: 12px 16px; border-radius: 8px; }
@@ -19,13 +20,10 @@ body { font-family: var(--font-sans); }
 .topic-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.5rem; }
 .topic-btn { font-size: 15px; padding: 6px 14px; border-radius: 20px; border: 2px solid var(--color-border-secondary); background: var(--color-background-secondary); color: var(--color-text-secondary); cursor: pointer; transition: all 0.2s; font-weight: bold; }
 .topic-btn.active { background: #2196F3; color: white; border-color: #1976D2; box-shadow: 0 2px 8px rgba(33, 150, 243, 0.4); }
-
-/* Front Stats Row: Shows only Total and Attempted */
-.stats-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 1.5rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
 .stat-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px; text-align: center; }
 .stat-val { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
 .stat-lbl { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
-
 .completion-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
 .completion-modal.show { display: flex; }
 .completion-card { background: white; padding: 40px; border-radius: 12px; text-align: center; max-width: 500px; }
@@ -33,7 +31,6 @@ body { font-family: var(--font-sans); }
 .final-score { font-size: 48px; font-weight: 700; color: #2196F3; margin: 20px 0; }
 .score-details { font-size: 16px; color: #666; margin: 10px 0; line-height: 1.8; }
 .score-percentage { font-size: 24px; font-weight: 600; color: #FF9800; margin-top: 20px; }
-
 .q-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; }
 .q-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .q-num { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); }
@@ -42,13 +39,16 @@ body { font-family: var(--font-sans); }
 .options { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; }
 .opt { padding: 8px 12px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); font-size: 13px; font-weight: bold; color: var(--color-text-primary); cursor: pointer; transition: all 0.15s; background: var(--color-background-primary); text-align: left; display: flex; align-items: center; gap: 8px; }
 .opt:hover:not(:disabled) { background: var(--color-background-secondary); border-color: var(--color-border-secondary); }
-
-/* Only Selection Blue remains */
 .opt.selected { background: var(--color-background-info); border-color: var(--color-border-info); }
+.opt.correct { background: var(--color-background-success); color: var(--color-text-success); border-color: var(--color-border-success); }
+.opt.wrong { background: var(--color-background-danger); color: var(--color-text-danger); border-color: var(--color-border-danger); }
 .checkbox { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--color-border-secondary); border-radius: 3px; background: white; flex-shrink: 0; position: relative; }
 .opt.selected .checkbox { background: #2196F3; border-color: #2196F3; }
 .opt.selected .checkbox::after { content: '✓'; color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; font-weight: bold; }
-
+.opt.correct .checkbox { background: #4CAF50; border-color: #4CAF50; }
+.opt.correct .checkbox::after { content: '✓'; color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; font-weight: bold; }
+.opt.wrong .checkbox { background: #f44336; border-color: #f44336; }
+.opt.wrong .checkbox::after { content: '✗'; color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; font-weight: bold; }
 .answer-box { display: none; margin-top: 10px; padding: 10px 14px; border-radius: var(--border-radius-md); background: var(--color-background-success); border-left: 3px solid var(--color-text-success); }
 .answer-box.show { display: block; }
 .answer-box .ans-label { font-size: 12px; font-weight: 700; color: var(--color-text-success); margin-bottom: 4px; }
@@ -76,6 +76,8 @@ body { font-family: var(--font-sans); }
   <div class="stats-row">
     <div class="stat-card"><div class="stat-val" id="total-q">75</div><div class="stat-lbl">Total questions</div></div>
     <div class="stat-card"><div class="stat-val" id="attempted">0</div><div class="stat-lbl">Attempted</div></div>
+    <div class="stat-card"><div class="stat-val" id="correct-count">0</div><div class="stat-lbl">Correct</div></div>
+    <div class="stat-card"><div class="stat-val" id="score-display">0%</div><div class="stat-lbl">Score</div></div>
   </div>
 
   <div class="topic-nav exam-not-started" id="topic-nav"></div>
@@ -87,7 +89,8 @@ body { font-family: var(--font-sans); }
       <div class="final-score" id="finalScore">0</div>
       <div class="score-details">
         <div>Total Questions: <strong id="totalQuestions">75</strong></div>
-        <div>Attempted Questions: <strong id="attemptedQuestions">0</strong></div>
+        <div>Correct Answers: <strong id="correctAnswers">0</strong></div>
+        <div>Wrong Answers: <strong id="wrongAnswers">0</strong></div>
         <div>Unattempted: <strong id="unattempted">75</strong></div>
       </div>
       <div class="score-percentage" id="scorePercentage">Score: 0%</div>
@@ -108,6 +111,9 @@ let attempted = 0, correct = 0;
 
 function updateStats() {
   document.getElementById('attempted').textContent = attempted;
+  document.getElementById('correct-count').textContent = correct;
+  const percentage = attempted > 0 ? Math.round((correct / attempted) * 100) : 0;
+  document.getElementById('score-display').textContent = percentage + '%';
 }
 
 let activeTopicId = topics[0].id;
@@ -130,11 +136,13 @@ function startTimer() {
     timeRemaining--;
     updateTimerDisplay();
     
+    // Check if 15 minutes remaining and show alert
     if (timeRemaining === 15 * 60 && !alertShown) {
       alertShown = true;
       alert('⏰ ALERT: 15 minutes remaining in your exam!');
     }
     
+    // Check if time is up
     if (timeRemaining <= 0) {
       clearInterval(timerInterval);
       completeExam();
@@ -151,6 +159,7 @@ function updateTimerDisplay() {
   const timerEl = document.getElementById('timer');
   timerEl.textContent = timeStr;
   
+  // Change color based on time remaining
   if (timeRemaining <= 15 * 60) {
     timerEl.classList.add('critical');
     timerEl.classList.remove('warning');
@@ -172,11 +181,13 @@ function completeExam() {
   document.getElementById('questions-area').classList.add('exam-not-started');
   
   const totalQs = 75;
+  const wrongAnswers = attempted - correct;
   const unattempted = totalQs - attempted;
-  const percentage = totalQs > 0 ? Math.round((correct / totalQs) * 100) : 0;
+  const percentage = Math.round((correct / totalQs) * 100);
   
   document.getElementById('totalQuestions').textContent = totalQs;
-  document.getElementById('attemptedQuestions').textContent = attempted;
+  document.getElementById('correctAnswers').textContent = correct;
+  document.getElementById('wrongAnswers').textContent = wrongAnswers;
   document.getElementById('unattempted').textContent = unattempted;
   document.getElementById('finalScore').textContent = correct;
   document.getElementById('scorePercentage').textContent = `Score: ${percentage}%`;
@@ -220,6 +231,10 @@ function renderQuestions() {
       <div class="options">
         ${q.opts.map((opt, oi) => {
           let cls = 'opt';
+          if (state !== undefined && state !== null) {
+            if (oi === q.ans) cls += ' correct';
+            else if (oi === state && state !== q.ans) cls += ' wrong';
+          }
           if (state === oi) cls += ' selected';
           return `<button class="${cls}" onclick="selectOpt(${gIdx},${oi},${q.ans})"><span class="checkbox"></span><span>${opt}</span></button>`;
         }).join('')}
@@ -240,14 +255,17 @@ function selectOpt(gIdx, chosen, correct_idx) {
   if (!examStarted) return;
   
   if (answeredMap[gIdx] === chosen) {
+    // Uncheck if already selected
     answeredMap[gIdx] = null;
     attempted--;
     if (chosen === correct_idx) correct--;
   } else if (answeredMap[gIdx] === undefined || answeredMap[gIdx] === null) {
+    // Check new answer
     answeredMap[gIdx] = chosen;
     attempted++;
     if (chosen === correct_idx) correct++;
   } else {
+    // Change answer
     if (answeredMap[gIdx] === correct_idx) correct--;
     answeredMap[gIdx] = chosen;
     if (chosen === correct_idx) correct++;
@@ -256,6 +274,7 @@ function selectOpt(gIdx, chosen, correct_idx) {
   updateStats();
   renderQuestions();
   
+  // Enable show answer button after option is selected
   setTimeout(() => {
     const showBtn = document.getElementById('showBtn-' + gIdx);
     if (showBtn && answeredMap[gIdx] !== null && answeredMap[gIdx] !== undefined) {
