@@ -164,24 +164,24 @@ let attempted = 0, correct = 0;
 
 const ADMIN_EMAIL = "ashadeep.009@gmail.com";
 
-function isfriday() {
-  return new Date().getDay() === 5; // 0 represents friday
+function issunday() {
+  return new Date().getDay() === 0; // 0 represents sunday
 }
 
 window.onload = function() {
-  if (!isfriday()) {
+  if (!issunday()) {
     document.getElementById('firstName').disabled = true;
     document.getElementById('lastName').disabled = true;
     const startBtn = document.getElementById('startBtn');
     startBtn.disabled = true;
-    startBtn.textContent = "EXAM UNLOCKS ONLY ON FRIDAYS";
+    startBtn.textContent = "EXAM UNLOCKS ONLY ON sundayS";
     startBtn.style.background = "#e74c3c";
   }
   updateTimerDisplay();
 }
 
 function validateForm() {
-  if (examStarted || !isfriday()) return;
+  if (examStarted || !issunday()) return;
   const fname = document.getElementById('firstName').value.trim();
   const lname = document.getElementById('lastName').value.trim();
   const startBtn = document.getElementById('startBtn');
@@ -201,7 +201,7 @@ function updateStats() {
 let activeTopicId = topics[0].id;
 
 function startExam() {
-  if (!isfriday()) return; 
+  if (!issunday()) return; 
   examStarted = true;
   document.getElementById('startBtn').disabled = true;
   document.getElementById('startBtn').textContent = 'EXAM IN PROGRESS';
