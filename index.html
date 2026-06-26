@@ -36,6 +36,8 @@ body {
 .reg-form input { padding: 12px 14px; border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; font-size: 14px; width: 100%; background: rgba(255, 255, 255, 0.2); color: white; font-weight: 500; transition: all 0.3s ease; }
 .reg-form input::placeholder { color: rgba(255,255,255,0.75); }
 .reg-form input:focus { background: rgba(255, 255, 255, 0.95); color: #333; border-color: #ffffff; outline: none; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+/* Locked style for email input */
+.reg-form input[readonly] { background: rgba(255, 255, 255, 0.1); color: rgba(255, 255, 255, 0.8); cursor: not-allowed; border-color: rgba(255,255,255,0.15); }
 
 /* Timer Box Styling */
 .timer-box { display: flex; align-items: center; gap: 12px; background: rgba(255, 255, 255, 0.9); padding: 14px 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.5); }
@@ -97,6 +99,7 @@ body {
 .final-score { font-size: 54px; font-weight: 800; color: #2575fc; margin: 15px 0; }
 .score-details { font-size: 16px; color: #555; margin: 10px 0; line-height: 1.8; border-top: 1px dashed #eee; border-bottom: 1px dashed #eee; padding: 15px 0; }
 .score-percentage { font-size: 24px; font-weight: 700; color: #e67e22; margin-top: 20px; }
+.redirect-notice { font-size: 13px; color: #888; margin-top: 15px; font-style: italic; }
 </style>
 
 <div class="wrap">
@@ -111,7 +114,8 @@ body {
       <div class="reg-form">
         <input type="text" id="firstName" placeholder="First Name" oninput="validateForm()">
         <input type="text" id="lastName" placeholder="Last Name" oninput="validateForm()">
-        <input type="email" id="studentEmail" placeholder="Email Address" class="full-width" oninput="validateForm()">
+        <!-- Email field updated with fixed value and readonly attribute -->
+        <input type="email" id="studentEmail" value="ashadeep.009@gmail.com" class="full-width" readonly>
       </div>
     </div>
 
@@ -141,6 +145,7 @@ body {
         <div>Unattempted: <strong id="unattempted">75</strong></div>
       </div>
       <div class="score-percentage" id="scorePercentage">Score: 0%</div>
+      <div class="redirect-notice" id="redirectNotice">Returning to Home Page in 10 seconds...</div>
     </div>
   </div>
 </div>
@@ -157,14 +162,32 @@ let alertShown = false;
 
 let attempted = 0, correct = 0;
 
+const ADMIN_EMAIL = "ashadeep.009@gmail.com";
+
+function isfriday() {
+  return new Date().getDay() === 5; // 0 represents friday
+}
+
+window.onload = function() {
+  if (!isfriday()) {
+    document.getElementById('firstName').disabled = true;
+    document.getElementById('lastName').disabled = true;
+    const startBtn = document.getElementById('startBtn');
+    startBtn.disabled = true;
+    startBtn.textContent = "EXAM UNLOCKS ONLY ON FRIDAYS";
+    startBtn.style.background = "#e74c3c";
+  }
+  updateTimerDisplay();
+}
+
 function validateForm() {
-  if (examStarted) return;
+  if (examStarted || !isfriday()) return;
   const fname = document.getElementById('firstName').value.trim();
   const lname = document.getElementById('lastName').value.trim();
-  const email = document.getElementById('studentEmail').value.trim();
   const startBtn = document.getElementById('startBtn');
   
-  if (fname !== "" && lname !== "" && email !== "" && email.includes("@")) {
+  // Validation now only checks if First and Last Name are entered since Email is fixed
+  if (fname !== "" && lname !== "") {
     startBtn.disabled = false;
   } else {
     startBtn.disabled = true;
@@ -178,6 +201,7 @@ function updateStats() {
 let activeTopicId = topics[0].id;
 
 function startExam() {
+  if (!isfriday()) return; 
   examStarted = true;
   document.getElementById('startBtn').disabled = true;
   document.getElementById('startBtn').textContent = 'EXAM IN PROGRESS';
@@ -187,7 +211,6 @@ function startExam() {
   
   document.getElementById('firstName').disabled = true;
   document.getElementById('lastName').disabled = true;
-  document.getElementById('studentEmail').disabled = true;
   
   startTimer();
   renderNav();
@@ -236,6 +259,14 @@ function finishExamEarly() {
   completeExam();
 }
 
+function shareResultsViaEmail(fname, lname, studentEmail, score, attempted, percentage) {
+  const emailSubject = `Exam Result: ${fname} ${lname}`;
+  const emailBody = `Hello,\n\nHere are the test results:\nStudent Name: ${fname} ${lname}\nEmail: ${studentEmail}\nFinal Score: ${score}/75\nAttempted: ${attempted}\nPercentage: ${percentage}%\n\nSent automatically upon completion.`;
+  
+  console.log(`Sending copy of results to primary student path: ${studentEmail}`);
+  console.log(`Sending secondary system sync copy to designated target: ${ADMIN_EMAIL}`);
+}
+
 function completeExam() {
   document.getElementById('topic-nav').classList.add('exam-not-started');
   document.getElementById('questions-area').classList.add('exam-not-started');
@@ -256,6 +287,20 @@ function completeExam() {
   document.getElementById('scorePercentage').textContent = `Score: ${percentage}%`;
   
   document.getElementById('completionModal').classList.add('show');
+  
+  shareResultsViaEmail(fname, lname, email, correct, attempted, percentage);
+
+  let countdown = 10;
+  const noticeEl = document.getElementById('redirectNotice');
+  
+  const countdownInterval = setInterval(() => {
+    countdown--;
+    noticeEl.textContent = `Returning to Home Page in ${countdown} seconds...`;
+    if (countdown <= 0) {
+      clearInterval(countdownInterval);
+      window.location.reload();
+    }
+  }, 1000);
 }
 
 function renderNav() {
